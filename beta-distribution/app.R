@@ -1,7 +1,8 @@
 
 library(shiny)
-library(tidyverse)
-library(bslib)
+library(ggplot2)
+library(dplyr)
+
 
 betapdf <- function(alpha, beta) {
   df <- tibble(
@@ -19,7 +20,6 @@ betapdf <- function(alpha, beta) {
     ) + theme_bw()
 }
 
-betapdf(1,2)
 
 ui1 <- fluidPage(
   column(1,
