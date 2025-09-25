@@ -1,11 +1,14 @@
+# Delete existing exports
+unlink("docs", recursive = TRUE)
 
-# Export beta-distribution app
+# Re-export with clean slate
+library(shinylive)
+
 shinylive::export(
   appdir = "beta-distribution",
   destdir = "docs/beta-distribution"
 )
 
-# Export conjugate-beta-model app
 shinylive::export(
   appdir = "conjugate-beta-model", 
   destdir = "docs/conjugate-beta-model"
