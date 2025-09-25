@@ -1,8 +1,7 @@
 
 library(shiny)
-library(ggplot2)
-library(dplyr)
-
+library(tidyverse)
+library(bslib)
 
 betapdf <- function(alpha, beta) {
   df <- tibble(
@@ -20,22 +19,21 @@ betapdf <- function(alpha, beta) {
     ) + theme_bw()
 }
 
-
 ui1 <- fluidPage(
-  column(1,
-         numericInput("numalpha", "α", value = 1, min = 0, max = 100, step = 0.1)
-         ),
+  column(3,
+         numericInput("numalpha", "Alpha (α)", value = 1, min = 0, max = 100, step = 0.1)
+  ),
   
-  column(1,
-         numericInput("numbeta", "β", value = 1, min = 0, max = 100,  step = 0.1)
-         ),
+  column(3,
+         numericInput("numbeta", "Beta (β)", value = 1, min = 0, max = 100,  step = 0.1)
+  ),
   
   plotOutput("posteriorPlot")
 )
 
 server1 <- function(input, output, session) {
   output$posteriorPlot <- renderPlot({
-  
+    
     alpha <- input$numalpha
     beta  <- input$numbeta
     

@@ -7,8 +7,8 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      numericInput("alpha", "Prior α (alpha)", value = 1, min = 0.1, step = 0.1),
-      numericInput("beta", "Prior β (beta)",   value = 1, min = 0.1, step = 0.1),
+      numericInput("alpha", "Prior Alpha (α)", value = 1, min = 0.1, step = 0.1),
+      numericInput("beta", "Prior Beta (β)", value = 1, min = 0.1, step = 0.1),
       numericInput("n_toss", "Number of tosses", value = 20, min = 1, step = 1),
       actionButton("start", "Start Simulation")
     ),
@@ -44,7 +44,7 @@ server <- function(input, output, session) {
   
   # Run simulation when Start is pressed
   observeEvent(input$start, {
-    rv$tosses <- rbinom(input$n_toss, 1, 0.2)  # fair coin
+    rv$tosses <- rbinom(input$n_toss, 1, 0.5)  # fair coin (changed from 0.2)
     rv$heads <- 0
     rv$tails <- 0
     rv$i <- 0
@@ -83,7 +83,6 @@ server <- function(input, output, session) {
       labs(title = paste("Coin Tosses (", rv$i, " of ", input$n_toss, ")", sep = ""),
            y = "Count", x = "") +
       theme_bw()
-
   })
   
   # Posterior distribution
@@ -100,7 +99,6 @@ server <- function(input, output, session) {
       labs(title = paste("Posterior Beta(", alpha_post, ",", beta_post, ")", sep = ""),
            y = "Density", x = "Probability of Heads") +
       theme_bw()
-
   })
 }
 
