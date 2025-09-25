@@ -1,5 +1,4 @@
 library(shiny)
-library(ggplot2)
 
 betapdf <- function(alpha, beta) {
   x <- seq(0, 1, length.out = 100)

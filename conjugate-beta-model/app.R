@@ -1,14 +1,13 @@
 
 library(shiny)
-library(ggplot2)
 
 ui <- fluidPage(
   titlePanel("Bayesian Coin Toss Simulation"),
   
   sidebarLayout(
     sidebarPanel(
-      numericInput("alpha", "Prior Alpha (α)", value = 1, min = 0.1, step = 0.1),
-      numericInput("beta", "Prior Beta (β)", value = 1, min = 0.1, step = 0.1),
+      numericInput("alpha", "Prior Alpha", value = 1, min = 0.1, step = 0.1),
+      numericInput("beta", "Prior Beta", value = 1, min = 0.1, step = 0.1),
       numericInput("n_toss", "Number of tosses", value = 20, min = 1, step = 1),
       actionButton("start", "Start Simulation")
     ),
@@ -27,10 +26,10 @@ server <- function(input, output, session) {
   output$priorPlot <- renderPlot({
     x <- seq(0, 1, length.out = 200)
     y <- dbeta(x, input$alpha, input$beta)
-    ggplot(data.frame(x, y), aes(x, y)) +
-      geom_line(color = "blue", linewidth = 1.2) +
-      labs(title = "Prior Beta Distribution", y = "Density", x = "Probability of Heads") +
-      theme_bw()
+    plot(x, y, type = "l", col = "blue", lwd = 2,
+         main = "Prior Beta Distribution",
+         xlab = "Probability of Heads", ylab = "Density")
+    grid()
   })
   
   # Simulation state
@@ -38,17 +37,15 @@ server <- function(input, output, session) {
     tosses = NULL,
     heads = 0,
     tails = 0,
-    i = 0, 
-    interval = 1000
+    i = 0
   )
   
   # Run simulation when Start is pressed
   observeEvent(input$start, {
-    rv$tosses <- rbinom(input$n_toss, 1, 0.5)  # fair coin (changed from 0.2)
+    rv$tosses <- rbinom(input$n_toss, 1, 0.5)
     rv$heads <- 0
     rv$tails <- 0
     rv$i <- 0
-    rv$interval <- round(20000 / input$n_toss) # distribute 20s evenly
     
     simulateStep()
   })
@@ -64,7 +61,7 @@ server <- function(input, output, session) {
         rv$tails <- rv$tails + 1
       }
       
-      invalidateLater(rv$interval, session)
+      invalidateLater(1000, session)
       simulateStep()
     }
   })
@@ -72,17 +69,12 @@ server <- function(input, output, session) {
   # Histogram of tosses
   output$histPlot <- renderPlot({
     req(rv$i > 0)
-    df <- data.frame(
-      Outcome = c("Heads", "Tails"),
-      Count = c(rv$heads, rv$tails)
-    )
+    counts <- c(rv$heads, rv$tails)
+    names(counts) <- c("Heads", "Tails")
     
-    ggplot(df, aes(x = Outcome, y = Count, fill = Outcome)) +
-      geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("Heads" = "skyblue", "Tails" = "orange")) +
-      labs(title = paste("Coin Tosses (", rv$i, " of ", input$n_toss, ")", sep = ""),
-           y = "Count", x = "") +
-      theme_bw()
+    barplot(counts, col = c("skyblue", "orange"),
+            main = paste("Coin Tosses (", rv$i, " of ", input$n_toss, ")"),
+            ylab = "Count")
   })
   
   # Posterior distribution
@@ -94,11 +86,10 @@ server <- function(input, output, session) {
     x <- seq(0, 1, length.out = 200)
     y <- dbeta(x, alpha_post, beta_post)
     
-    ggplot(data.frame(x, y), aes(x, y)) +
-      geom_line(color = "red", linewidth = 1.2) +
-      labs(title = paste("Posterior Beta(", alpha_post, ",", beta_post, ")", sep = ""),
-           y = "Density", x = "Probability of Heads") +
-      theme_bw()
+    plot(x, y, type = "l", col = "red", lwd = 2,
+         main = paste("Posterior Beta(", alpha_post, ",", beta_post, ")"),
+         xlab = "Probability of Heads", ylab = "Density")
+    grid()
   })
 }
 
